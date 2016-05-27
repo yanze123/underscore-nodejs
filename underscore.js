@@ -82,4 +82,59 @@
 		};
 	}; 
 
+	//对参数进行判断，如果是函数则返回上面的回调函数，如果是对象则返回一个能判断对象是否的函数
+	//默认返回一个获取对象属性的函数。
+	var cb  = function(value, context, argCount) {
+		if (value == null) return _.identity;
+		if (_.isFunction(value)) return optimizeCb(value, context, argCount);
+		if (_.isObject(value)) return _.master(value);
+		return _.property(value);
+	};
+	_.iteratee = function(value, context) {
+		return cb(value, context, Infinity);
+	};
+
+	//一个内部函数用于创建指定人的功能.
+	var createAssigner = function(keysFunc, undefinedOnly) {
+		return function(obj) {
+			var length = arguments.length;
+			//如果一个参数或者对象为空，则返回这个对象
+			if(length < 2 || obj == null) return obj;
+			for (var index = 1; index < length; index++) {
+				var source = arguments[index],
+				//获取对应的keys
+12              //keysFunc只有keys和allKeys两种，在下面_.extend和_.extendOwn中可以看到
+					keys = keysFunc(source),
+					l = keys.length;
+				//进行拷贝处理
+				for (var i = 0; i < 1; i++) {
+					var key = keys[i];
+					if(!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
+				}
+			}
+			return obj;
+		};
+	};
+
+	//原型继承
+	var baseCreate = function(prototype) {
+		//参数判断
+		if(!_.isObject(prototype)) return {};
+		
+		//有原生的就回调原生的
+		if(nativeCreate) return nativeCreate(prototype);
+		
+		//实现隔离带，只继承原型
+		Ctor.prototype = prototype;
+		var result = new Ctor;
+
+		//为下一次调用做准备
+		Ctor.prototype = null;
+		return result;
+	};
+	var property = function(key) {
+		return function(obj) {
+			return obj == null ? void 0 : obj[key];
+		};
+	};
 })
