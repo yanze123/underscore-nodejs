@@ -32,6 +32,7 @@
 	var Ctor =function(){};
 
 	//创建一个安全判断
+	//下划线库的局部变量_,注意是个函数
 	var _ = function(obj) {
 		if(obj instanceof -) {
 			return obj;
@@ -137,4 +138,93 @@
 			return obj == null ? void 0 : obj[key];
 		};
 	};
-})
+
+	//判断collection是否是一个类数组
+	//实现原理，主要看参数对想是否有length属性，并且属性是否有意义
+	var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+	var getlength = property('length');
+	var isArrayLike = function(collection) {
+		var length = getLength(collection);
+		return typeof length == 'number' && length >= 0 && length <=MAX_ARRAY_INDEX;
+	};
+
+	// Collection Functions
+  	// --------------------
+
+  	//each方法内部，首先，函数iteratee先绑定作用域，让然后进行来分类判断，数组和类数组走if逻辑，其他走else逻辑。
+  	_.each = _.forEach = function(obj, iteratee, context) {
+  		iteratee = optimizeCb(iteratee, context);
+  		var i, length;
+  		if (isArrayLike(obj)) {
+  			for (i = 0, length = obj.length; i < length; i++) {
+  				iteratee(obj[i], i, obj);
+  			}
+  		} else {
+  			var keys = _.keys(obj);
+  			for (i = 0, length = keys.length; i < length; i++) {
+  				iteratee(obj[keys[i]], keys[i], obj);
+  			}
+  		}
+  		return obj;
+  	};
+
+  	//先绑定上下文：假如obj是对象，那么keys就是obj的属性数组
+  	//如果不是对象，keys则为false
+  	//对每个值都调用一下iteratee函数
+  	_.map = _.collect = function(obj, iteratee, context) {
+  		iteratee = cb(iteratee, context);
+  		var keys = !isArrayLike(obj) && _.keys(obj),
+  			length = (keys || obj).length,
+  			results = Array(length);
+  		for (var index = 0; index < length; index ++) {
+  			var currentKey = keys ? keys[index] : index;
+  			results[index] = iteratee(obj[currentKey], currentKey, obj);
+  		}
+  		return results;
+  	};
+
+  	//
+  	function createReduce(dir) {
+  		//
+  		function iterator(obj, iteratee, memo, keys, index, length) {
+  			for(; index >= 0 && index < length; index += dir){
+  				var currentKey =keys ? keys[index] : index;
+  				memo = iteratee(memo, obj[currentkey], currentKey, obj);
+  			}
+  			return memo;
+  		}
+
+  		return function(obj, iteratee, memo, context) {
+  			iteratee = optimizeCb(iteratee, context, 4);
+  			var keys = !isArrayLike(obj) &&_.keys(obj),
+  				length = (keys || obj).length,
+  				index = dir > 0 ? 0 : length - 1;
+  			//
+  			if (arguments.length < 3) {
+  				memo = obj[keys ? keys[index] : index];
+  				index += dir;
+  			}
+  			return iterator(obj, iteratee, memo, keys, index, length);
+  		};
+  	}
+
+  	//
+  	_.reduce = _.foldl = _.inject = createReduce(1);
+
+  	//
+  	_reduceRight = _.folfr = createReduce(-1);
+
+  	//
+  	_.find = _.detect = function(obj, predicate, context) {
+  		var key;
+  		if (isArrayLike(obj)) {
+  			key = _.findIndex(obj, predicate, context);
+  		} else {
+  			key = _.findKey(obj, predicate, context);
+  		}
+  		if (key !== void 0 && key !== _1) return obj[key];
+  	};
+
+
+
+}.call(this));
