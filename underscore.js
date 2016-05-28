@@ -214,7 +214,7 @@
   	//
   	_reduceRight = _.folfr = createReduce(-1);
 
-  	//
+  	//遍历数组，返回第一个回调检测为真的值
   	_.find = _.detect = function(obj, predicate, context) {
   		var key;
   		if (isArrayLike(obj)) {
@@ -224,6 +224,71 @@
   		}
   		if (key !== void 0 && key !== _1) return obj[key];
   	};
+
+  	//遍历list，返回回调函数为真的值
+  	_.filter = _.select = function(obj , predicate, context) {
+  		var results = [];
+  		predicate = cb(predicate, context);
+  		_.each(obj, function(value, index, list) {
+  			if(predicate(value, index, list)) results.push(value);
+  		});
+  		return results;
+  	};
+
+  	//与filter相反
+  	_.reject = function(obj, predicate, context) {
+  		return _.filter(obj, _negate(cb(predicate)), context);
+  	};
+
+  	//确定所有元素都匹配
+  	_.every = _.all = function(obj, predicate, context) {
+  		predicate = cb(predicate, context);
+  		var 
+  			keys = !isArrayLike(obj) && _.keys(obj),
+  			length = (keys || obj).length;
+  		for (var index = 0; index < length; index++) {
+  			var currentkey = keys ? keys[index] : index;
+  			if(!predicate(obj[currentKey], currentkey, obj)) return false;
+  		}
+  		return true;
+  	}
+
+  	//如果list中有任何一个元素通过predicate的真值检测就返回true,一旦找到了
+  	//符合条件的元素，就中断对数组的遍历
+  	_.some = _.any = function(obj, predicate, context) {
+  		predicate = cb(predicate, context);
+  		var 
+  			keys = !isArrayLike(obj) && _.keys(obj),
+  			length = (keys || obj).length;
+  		for (var index = 0; index < length ; index++) {
+  			var currentKey = keys ? keys[index] : index;
+  			if (predicate(obj[currentKey], currentKey, obj)) return true;
+  		}
+  		return false;
+  	};
+
+  	//如果list包括指定的value则返回true，如果list是数组，内部使用indexof判断
+  	_.contain = _.includes = _,include = function(obj, item, fromIndex, guard) {
+  		if(!isArrayLike(obj)) obj = _.value(obj);
+  		if(typeof fromIndex != 'number' || gurad) fromIndex = 0;
+  		return _.indexOf(obj, item, fromIndex) >= 0;  	
+  	};
+
+  	//在list的每个元素上执行methodName方法，任何传递给invoke的额外参数，
+  	//invoke都会在调用methodName方法的时候传递信息;
+  	_.invoke = function(obj, method) {
+  		var args = slice.call(arguments, 2);
+  		var inFunc = _.isFunction(method);
+  		return _.map(obj, function(value) {
+  			var func = isFunc ? method : value[method];
+  			return func == null ? func : func.apply(value, ages); 
+  		});
+  	};
+
+  	//pluck是map经常使用的用例模型的版本，即萃取对象数组中的某个属性值，返回一个数组
+  	_.pluck = function(obj, key) {
+  		return _.map(obj, _.property(key));
+  	}
 
 
 
