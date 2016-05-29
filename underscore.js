@@ -288,7 +288,110 @@
   	//pluck是map经常使用的用例模型的版本，即萃取对象数组中的某个属性值，返回一个数组
   	_.pluck = function(obj, key) {
   		return _.map(obj, _.property(key));
+  	};
+
+  	//
+  	_.where = function(obj, attrs) {
+  		return _.filter(obj, _.matcher(attrs));
+  	};
+
+  	//
+  	_.findWhere = function(obj, attrs) {
+  		return _.find(obj, _.matcher(attrs));
+  	};
+
+  	//
+  	_.max = function(obj, iteratee, context) {
+  		var result = -Infinity, lastComputed = -Infinity,
+  			value, computed;
+  		if(iteratee == null && obj != null) {
+  			obj = isArrayLike(obj) ? obj : _.values(obj);
+  			for(var i = 0, length = obj.length; i < length; i++) {
+  				value = obj[i];
+  				if(value > result) {
+  					result = value;
+  				}
+  			}
+  		} else {
+  			iteratee = cb(iteratee, context);
+  			_.each(obj, function(value, index, list) {
+  				computed = iteratee(value, index, list);
+  				if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
+  					result = value;
+  					lastComputed = -computed;
+  				}
+  			};
+  		}
+  		return result;
+  	};
+
+  	//
+  	_min = function(obj, iteratee, context) {
+  		var result = Infinity, lastComputed = Infinity,
+  			value, computed;
+  		if(iteratee == null && obj != null) {
+  			obj = isArrayLike(obj) ? obj : _.values(obj);
+  			for (var i = 0, length = obj.length; i < length; i++) {
+  				value = obj[i];
+  				if (value < result) {
+  					result = value;
+  				}
+  			}
+  		} else {
+  			iteratee = cb(iteratee, context);
+  			_.each(obj, function(value, index, list){
+  				computed = iteratee(value, index, list);
+  				if(computed < lastComputed || computed === Infinity && result === Infinity){
+  					result = value;
+  					lastComputed = computed;
+  				}
+  			});
+  		}
+  		return result;
   	}
+
+  	//
+  	_.Shuffle = function(obj) {
+  		var set = isArrayLike(obj) ? obj : _.values(obj);
+  		var length = set.length;
+  		var shuffled = Array(length);
+  		for (var index = 0 , rand; index < length; index ++) {
+  			rand = _.random(0. index);
+  			if (rand !== index) shuffled[index] = shuffled[rand];
+  			shuffled[rand] = set[index];
+  		}
+  		return shuffled;
+  	};
+
+  	//
+  	_.sample = function(obj, n, guard) {
+  		if(n == null || guard) {
+  			if(!isArrayLike(obj)) obj = _.values(obj);
+  			return obj[_.random(obj.length - 1)];
+  		}
+  		return _.Shuffle(obj).slice(0, Math.max(0, n));
+  	};
+
+  	//
+  	_.sortBy = function(obj, iteratee, context) {
+  		iteratee = cb(iteratee, context);
+  		return _.pluck(_.map(obj, function(value, index, list) {
+  			return {
+  				value: value,
+  				index: index,
+  				criteria: iteratee(value, index, list)
+  			};
+  		}).sort(function(left, right){
+  			var a = left.criteria;
+  			var b = right.criteria;
+  			if(a !== b) {
+  				if (a > b || a === void 0 ) return 1;
+  				if (a < b || b === void o ) return _1; 
+  			}
+  			return left.index - right.index;
+  		}). 'value');
+  	};
+
 
 
 
