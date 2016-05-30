@@ -392,6 +392,123 @@
   		}). 'value');
   	};
 
+  	//
+  	var group = function(behavior) {
+  		return function(obj, iteratee, context) {
+  			var result = {};
+  			iteratee = cb(iteratee, context);
+  			_.each(obj, function(value, index) {
+  				var key = iteratee(value, index, obj);
+  				behavior(result, value, key);
+  			});
+  			return result;
+    	};
+  	};
+
+  	//
+  	_.groupBy = group(function(result, value, key) {
+  		if (_.has(result, key)) result[key].push(value); else result[key] = [value];
+  	});
+
+  	//
+  	_.indexBy = group(function(result, value, key) {
+  		result[key] = value;
+  	});
+
+  	//
+  	_.countBy = group(function(result, value, key) {
+  		if(_.has(result, key)) result[key]++; else result[key] = 1;
+  	});
+
+  	//
+  	_.toArray = function(obj) {
+  		if(!obj) return [];
+  		if(_.isArray(obj)) return slice.call(obj);
+  		if(isArrayLike(obj)) return _.map(obj, _.identity);
+  		return _.values(obj);
+  	};
+
+  	//
+  	_.size = functon(obj) {
+  		if (obj == null) return 0;
+  		return isArrayLike(obj) ? obj.length : _.keys(obj).length; 
+  	};
+
+  	//
+  	_.partition = function(obj, predicate, context) {
+  		predicate = cb(predicate, context);
+  		var pass = [], fail = [];
+  		_.each(obj, function(value, key, obj) {
+  			(predicate(value, key, obj) ? pass : fail).push(value);
+  		});
+  		return [pass, fail];
+  	};
+
+  	//Array Functions
+
+  	//
+  	_.first = _.head = _.take = function(array, n, guard) {
+  		if (array == null) return void 0;
+  		if (n ==null || guard) return array[0];
+  		return _.initial(array, array.length -n);
+  	};
+
+  	//
+  	_.initial = function(array, n, guard) {
+  		return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 :n)));
+  	};
+
+  	//
+  	_.last = function(array, n, guard) {
+  		if (array ==null) return void 0;
+  		if (n == null || guard) return array[array.length - 1];
+  		return _.rest(array, Math.max(0, array.length - n));
+  	};
+
+  	//
+  	_.rest = _.tail = _.drop = function(array, n, guard) {
+  		return slice.call(array, n == null || guard ? 1 : n);
+  	};
+
+  	//
+  	_.compact = function(array) {
+  		return _.filter(array, _.identity);
+  	};
+
+  	//
+  	var flatten = function(input, shallow, strict, startIndex) {
+  		var output = [], idx = 0;
+  		for (var i = startIndex || 0, length = getLength(input); i < length; i++) {
+  			var value = input[i];
+  			if(isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+  				//
+  				if(!shallow) value = flatten(value, shallow, strict);
+  				var j = 0, len = value.length;
+  				output.length += len;
+  				while (j < len) {
+  					output[idx++] = value[j++];
+  				}
+   			} else if (!strict) {
+   				output[idx++] = value;
+   			}
+  		}
+  		return output;
+  	};
+
+  	//
+  	_.flatten = function(array, shallow) {
+  		return flatten(array, shallow, false);
+  	};
+  	
+  	//
+  	_.without = function(array) {
+  		return _.difference(array, slice.call(arguments, 1));
+  	};
+
+
+
+
+
 
 
 
