@@ -43,7 +43,7 @@
 		this._wrapped = obj;
 	};
 
-	//导出下划线后的变量，如果是在浏览器中，则添加"_"作为全局变量
+	//导出下划线后的变量，如果是在浏览器中，则添加"_"作为全局变量.
 	if(typeof exports !== 'underfined'){
 		if(typeof module !== 'underfined' && module.exports) {
 			exports = module.exports = _;
