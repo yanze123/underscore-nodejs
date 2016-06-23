@@ -7,4 +7,5 @@ For Docs, License, Tests, and pre-packed downloads, see:
 http://underscorejs.org
 
 Underscore is an open-sourced component of DocumentCloud:
+
 https://github.com/documentcloud
