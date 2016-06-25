@@ -1,5 +1,6 @@
 //Underscore.js 1.8.3
 //previous 之前的 prototype 原型  hasownproperty 属性 wrapped 封装 context 环境
+
 (function(){
 
 	//建立根对象
